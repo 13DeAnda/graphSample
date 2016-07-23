@@ -2572,46 +2572,43 @@ var Graph = React.createClass({
 	
 
 	getInitialState() {
+		var data = this.transformGraphData(carData, 1);
 		return {
+			data: data
 		};
 	},
-	componentWillMount(){
-		//would call the transform into graph data
-	},
 
-	//transformed every time
 	transformGraphData(data, quarter){
 		var graphData =[];
 		var indexMap = {};
 
-		_.forEach(carData, function(point){
+		_.forEach(carData, function(point, i){
 
 			if(point['fiscal.quarter'] === quarter){
 				var year = point['fiscal.year'];
-				var index = indexMap[year];
-				
-				console.log(indexMap[year], indexMap);
-					
-					
-				if(!indexMap[year]){
 
+				if(!indexMap[year]){
 					graphData.push({
 						name: point['fiscal.year'],
 						values: []
 					});
 
-					index = graphData.length -1;
-					indexMap[year]=index;
+					indexMap[year]=graphData.length;
 				}
+				var index = indexMap[year]-1;
+				var date = point.date.split("-");
+
+				var dayOfQuarter = (Number(date[1])-quarter*2)*30+ Number(date[2]);
 				
-				//var date = point.date.split("-");
-				//TODO:?? verify operations
-				//var dayOfQuarter = (Number(date[1])-quarter*2)*30+ Number(date[2]); 
-				//daily normalized would depend on type
-				//graphData[index].values.push({"x": dayOfQuarter, "y": point['car.count']});
+				var carCount = Number(point['car.count']);
+				
+				//to change depending of type
+				graphData[index].values.push({"x": dayOfQuarter, "y": carCount });
+
+					
 			}
 		});
-
+		return graphData;
 	},
 
 	render() {
@@ -2631,16 +2628,23 @@ var Graph = React.createClass({
 			      { "x": 13, "y":  94},
 			      { "x": 23, "y":  46},
 			      { "x": 33, "y":  34}
-			    ]
+			    ],
+			    "shapecolor": "red"
 	    	}
 		];
+		var lineColors = ["#b366ff", "#80bffff", "#ffff66", "#aaff80", "#ff8c1a", "#e60000"];
+		var lineFunction = function(index) {
+			return lineColors[index];
+		};
+		var lineColor= {2010: "blue", 2011: "red"};
 
 		this.transformGraphData(carData, 1);
 		return (
 			<Grid >
 			<LineChart
-                  data={barData}
-                  width={600}
+                  data={this.state.data}
+                  colors={lineFunction}
+                  width={1000}
                   height={400}
                   title='Cars'
                 />
