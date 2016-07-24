@@ -7,7 +7,7 @@ import Buttons from './buttons.jsx';
 import customData from './cars-by-day.json';
 
 const styles = {
-	container:{
+	containerGraphViewer:{
 		marginTop: '50px',
 		marginLeft: '50px'
 	}
@@ -54,6 +54,10 @@ const quarters= [
 ];	
 
 const years= [
+	{
+		text: "2009",
+		color: "#ff4dd2"
+	},
 	{
 		text: "2010",
 		color: "#b366ff"
@@ -2669,10 +2673,13 @@ var GraphViewer = React.createClass({
 	transformGraphData(data, quarter, counts){
 		var graphData =[];
 		var indexMap = {};
-		var normalizedStart = 0;
+		var currentYear = "";
+		var normalizedStart = "";
+		var that = this;
 		_.forEach(data, function(point, i){
 
 			if(point['fiscal.quarter'] === quarter){
+
 				var year = point['fiscal.year'];
 
 				if(!indexMap[year]){
@@ -2686,29 +2693,27 @@ var GraphViewer = React.createClass({
 				var index = indexMap[year]-1;
 				var date = point.date.split("-");
 
-				var dayOfQuarter = (Number(date[1])-quarter*2)*30+ Number(date[2]);
-				
+				var dayOfQuarter = graphData[index].values.length + 1;
+
 				var carCount = Number(point['car.count']);
-				
 				if(counts === "daily"){
 					graphData[index].values.push({"x": dayOfQuarter, "y": carCount });
 				}
 				else if(counts === "com"){
+					if(currentYear !== year){
+						normalizedStart = 0;
+						currentYear = year;
+					}
+
 					normalizedStart += carCount;
 					graphData[index].values.push({"x": dayOfQuarter, "y": normalizedStart });
 				}
 				else if(counts === "yoy"){
-					// assumes there is data for every single day of the year, and all 365 years.//  todo if i get time
-					//if there is no previous day on data just put in normalized graph.
-					if((i -365) < 0){
-						graphData[index].values.push({"x": dayOfQuarter, "y": normalizedStart });
-					}
-					else{
+					if((i -365) > -1){
 						var previousYear = carData[i-365];
 						var cars = Number(previousYear['car.count']);
 						var yoyValue = carCount - cars;
 						graphData[index].values.push({"x": dayOfQuarter, "y": yoyValue });
-
 					}
 				}			
 			}
@@ -2718,9 +2723,9 @@ var GraphViewer = React.createClass({
 
 	render() {
 		return (
-			<Grid style={styles.container} >
+			<Grid style={styles.containerGraphViewer} >
 				<Row>
-					<Col sm={4} >
+					<Col sm={3} >
 						<Buttons 
 							carStateChange = {this.carStateChange}
 							quarterStateChange = {this.quarterStateChange}
@@ -2730,7 +2735,7 @@ var GraphViewer = React.createClass({
 							cars = {this.state.cars}
 							years = {years}/>
 					</Col>
-					<Col sm={6}>
+					<Col sm={7}>
 						<Graph carData = {this.state.data} />
 					</Col>
 				</Row>
