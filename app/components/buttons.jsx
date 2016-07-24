@@ -15,7 +15,6 @@ const styles = {
 		borderLeft: '1px solid #a6a6a6',
 		borderBottom: '1px solid #a6a6a6',
 		textAlign: 'center',
-
 	},
 	quarterSection:{
 		marginBottom: '40px',
@@ -38,8 +37,6 @@ const styles = {
 };
 
 var Buttons = React.createClass({
-
-
 	carButtonClick(key){
 		this.props.carStateChange(key);
 	},

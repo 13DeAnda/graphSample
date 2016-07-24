@@ -4,6 +4,7 @@ import {Row, Col, Grid} from 'react-bootstrap';
 
 import Graph from './graph.jsx';
 import Buttons from './buttons.jsx';
+import customData from './cars-by-day.json';
 
 const styles = {
 	container:{
@@ -2643,20 +2644,76 @@ const carData = [
 var GraphViewer = React.createClass({
 
 	getInitialState() {
+		var cars = carCounts[0].key;
+		var quarter = quarters[0].key;
+		var data = this.transformGraphData(carData, quarter, cars);
+
 		return {
-			quarter: quarters[0].key,
-			cars: carCounts[0].key
+			quarter: quarter,
+			cars: cars,
+			data: data
 		};
 	},
-	componentWillMount(){
+
+	carStateChange(cars){
+		var quarter = this.state.quarter;
+		var data = this.transformGraphData(carData, quarter, cars);
+		this.setState({cars: cars, data: data});
 	},
 
-	carStateChange(key){
-		this.setState({cars: key});
+	quarterStateChange(quarter){
+		var cars = this.state.cars
+		var data = this.transformGraphData(carData, quarter, cars);
+		this.setState({quarter: quarter, data: data});
 	},
+	transformGraphData(data, quarter, counts){
+		var graphData =[];
+		var indexMap = {};
+		var normalizedStart = 0;
+		_.forEach(data, function(point, i){
 
-	quarterStateChange(key){
-		this.setState({quarter: key});
+			if(point['fiscal.quarter'] === quarter){
+				var year = point['fiscal.year'];
+
+				if(!indexMap[year]){
+					graphData.push({
+						name: point['fiscal.year'],
+						values: []
+					});
+
+					indexMap[year]=graphData.length;
+				}
+				var index = indexMap[year]-1;
+				var date = point.date.split("-");
+
+				var dayOfQuarter = (Number(date[1])-quarter*2)*30+ Number(date[2]);
+				
+				var carCount = Number(point['car.count']);
+				
+				if(counts === "daily"){
+					graphData[index].values.push({"x": dayOfQuarter, "y": carCount });
+				}
+				else if(counts === "com"){
+					normalizedStart += carCount;
+					graphData[index].values.push({"x": dayOfQuarter, "y": normalizedStart });
+				}
+				else if(counts === "yoy"){
+					// assumes there is data for every single day of the year, and all 365 years.//  todo if i get time
+					//if there is no previous day on data just put in normalized graph.
+					if((i -365) < 0){
+						graphData[index].values.push({"x": dayOfQuarter, "y": normalizedStart });
+					}
+					else{
+						var previousYear = carData[i-365];
+						var cars = Number(previousYear['car.count']);
+						var yoyValue = carCount - cars;
+						graphData[index].values.push({"x": dayOfQuarter, "y": yoyValue });
+
+					}
+				}			
+			}
+		});
+		return graphData;
 	},
 
 	render() {
@@ -2674,10 +2731,7 @@ var GraphViewer = React.createClass({
 							years = {years}/>
 					</Col>
 					<Col sm={6}>
-						<Graph
-							cars = {this.state.cars}
-							quarter = {this.state.quarter}
-							carData = {carData} />
+						<Graph carData = {this.state.data} />
 					</Col>
 				</Row>
 			</Grid> 

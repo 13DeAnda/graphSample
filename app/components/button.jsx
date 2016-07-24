@@ -2,7 +2,6 @@ import React from 'react';
 import _ from 'lodash';
 import {Row, Col, Grid} from 'react-bootstrap';
 
-
 const styles = {
 	carSection:{
 		marginBottom: '40px'
@@ -54,6 +53,5 @@ var Button = React.createClass({
 		);
   }
 });
-
 
 module.exports = Button;
