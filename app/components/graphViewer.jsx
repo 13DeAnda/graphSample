@@ -5,6 +5,7 @@ import {Row, Col, Grid} from 'react-bootstrap';
 import Graph from './graph.jsx';
 import Buttons from './buttons.jsx';
 import customData from './cars-by-day.json';
+import constants from './constants';
 
 const styles = {
 	containerGraphViewer:{
@@ -12,88 +13,12 @@ const styles = {
 		marginLeft: '50px'
 	}
 };
-const carCounts = [
-	{
-		text: "daily Normalized Car Counts",
-		key: "daily",
-		selected: false
-	},
-	{
-		text: "Comulative Car Counts",
-		key: "com",
-		selected: false
-	},
-	{
-		text: "YoY Change in Car Counts",
-		key: "yoy",
-		selected: false
-	}
-];
-
-const quarters= [
-	{
-		text: "Q1",
-		key: 1,
-		selected: false
-	},
-	{
-		text: "Q2",
-		key: 2,
-		selected: false
-	},
-	{
-		text: "Q3",
-		key: 3,
-		selected: false
-	},
-	{
-		text: "Q4",
-		key: 4,
-		selected: false
-	}	
-];	
-
-const years= [
-	{
-		text: "2009",
-		color: "#ff4dd2"
-	},
-	{
-		text: "2010",
-		color: "#b366ff"
-	},
-	{
-		text: "2011",
-		color: "#80bffff"
-	},
-	{
-		text: "2012",
-		color: "#ffff66"
-	},
-	{
-		text: "2013",
-		color: "#aaff80"
-	},
-	{
-		text: "2014",
-		color: "#ffff99"
-	},
-	{
-		text: "2015",
-		color: "#ff8c1a"
-	},
-	{
-		text: "2016",
-		color: "#e60000"
-	},
-];
-
 
 var GraphViewer = React.createClass({
 
 	getInitialState() {
-		var cars = carCounts[0].key;
-		var quarter = quarters[0].key;
+		var cars = constants.carCounts[0].key;
+		var quarter = constants.quarters[0].key;
 		var data = this.transformGraphData(customData.values, quarter, cars);
 
 		return {
@@ -173,11 +98,11 @@ var GraphViewer = React.createClass({
 						<Buttons 
 							carStateChange = {this.carStateChange}
 							quarterStateChange = {this.quarterStateChange}
-							quarters = {quarters}
+							quarters = {constants.quarters}
 							quarter = {this.state.quarter}
-							carCounts = {carCounts}
+							carCounts = {constants.carCounts}
 							cars = {this.state.cars}
-							years = {years}/>
+							years = {constants.years}/>
 					</Col>
 					<Col sm={7}>
 						<Graph carData = {this.state.data} />
