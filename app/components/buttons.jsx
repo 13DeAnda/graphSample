@@ -1,80 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import {Row, Col, Grid} from 'react-bootstrap';
-
-
-
-const carCounts = [
-	{
-		text: "daily Normalized Car Counts",
-		key: "daily",
-		selected: false
-	},
-	{
-		text: "Comulative Car Counts",
-		key: "com",
-		selected: false
-	},
-	{
-		text: "YoY Change in Car Counts",
-		key: "yoy",
-		selected: false
-	}
-];
-
-const quarters= [
-	{
-		text: "Q1",
-		key: "q1",
-		selected: false
-	},
-	{
-		text: "Q2",
-		key: "q2",
-		selected: false
-	},
-	{
-		text: "Q3",
-		key: "q3",
-		selected: false
-	},
-	{
-		text: "Q4",
-		key: "q4",
-		selected: false
-	}	
-];	
-
-const years= [
-	{
-		text: "2010",
-		color: "#b366ff"
-	},
-	{
-		text: "2011",
-		color: "#80bffff"
-	},
-	{
-		text: "2012",
-		color: "#ffff66"
-	},
-	{
-		text: "2013",
-		color: "#aaff80"
-	},
-	{
-		text: "2014",
-		color: "#ffff99"
-	},
-	{
-		text: "2015",
-		color: "#ff8c1a"
-	},
-	{
-		text: "2016",
-		color: "#e60000"
-	},
-];
+import Button from './button.jsx';
 
 const styles = {
 	carSection:{
@@ -88,7 +15,6 @@ const styles = {
 		borderLeft: '1px solid #a6a6a6',
 		borderBottom: '1px solid #a6a6a6',
 		textAlign: 'center',
-
 	},
 	quarterSection:{
 		marginBottom: '40px',
@@ -111,61 +37,54 @@ const styles = {
 };
 
 var Buttons = React.createClass({
-
-	getInitialState() {
-		return {
-			quarter: quarters[0].key,
-			cars: carCounts[0].key
-		};
-	},
-	componentWillMount(){
+	carButtonClick(key){
+		this.props.carStateChange(key);
 	},
 
-	carButtonClick(){
-		console.log("car button clicked");
+	quarterButtonClick(key){
+		this.props.quarterStateChange(key);
 	},
-	quarterButtonClick(){
-		console.log("car button clicked");
-
-	},
-	render() {
-
-			
+	
+	render() {	
 		return (
 			<Grid >
 				<div style={styles.carSection}>
 
-					{_.map(carCounts, (button, key)=>{
+					{_.map(this.props.carCounts, (button, key)=>{
 						var selectedStyle = _.clone(styles.carButton);
 						
-						if(this.state.cars === button.key){
-							selectedStyle.background = 'white';
+						if(this.props.cars === button.key){
+							selectedStyle.backgroundColor = 'white';
 							selectedStyle.fontWeight = 'bold';
 						}
 						return( 
-							<div key={key} style={selectedStyle} onClick={this.carButtonClick}>
-								{button.text}
-							</div>
+							<Button value = {button.key} 
+									onClick = {this.carButtonClick} 
+									text ={button.text}
+									style={selectedStyle} 
+									key = {key}/>
 						);
 					})}
 				</div>
 				<div style={styles.quarterSection}>
-					{_.map(quarters, (button, key)=>{
+					{_.map(this.props.quarters, (button, key)=>{
 						var selectedStyle = _.clone(styles.quarterButton);
 						
-						if(this.state.quarter === button.key){
-							selectedStyle.background = 'white';
+						if(this.props.quarter === button.key){
+							selectedStyle.backgroundColor = 'white';
 							selectedStyle.fontWeight = 'bold';
 						}
 						return( 
-							<div key={key} style={selectedStyle} onClick={this.quarterButtonClick}>
-								{button.text}
-							</div>
+							<Button value = {button.key} 
+									onClick = {this.quarterButtonClick} 
+									text ={button.text}
+									style={selectedStyle}
+									key = {key} />
 						);
 					})}
 				</div>
 				<div style={styles.yearsSection}>
-					{_.map(years, (button, key)=>{
+					{_.map(this.props.years, (button, key)=>{
 						
 						return( 
 							<div key={key} >
